@@ -23,8 +23,11 @@ This module is a extending Config::AutoConf, using a INI-like config file.
 
     use Config::AutoConf::INI;
 
-    Config::AutoConf::INI->new()->check('config.ini')->write_config_h;
-    Config::AutoConf::INI->check('config.ini')->write_config_h;
+    Config::AutoConf::INI->new()->check('config.ini');
+    Config::AutoConf::INI->new()->check();
+
+    Config::AutoConf::INI->check('config.ini');
+    Config::AutoConf::INI->check();
 
 =head1 SUBROUTINES/METHODS
 
@@ -36,9 +39,11 @@ This method can be used using an Config::AutoConf::INI instance, or the class it
 
   my $self = Config::AutoConf::INI->new();
   $self->check('config.ini');
-  $self->->write_config_h;
+  $self->write_config_h('somewhere_else.h');
 
-  Config::AutoConf::INI->check('config.ini')->write_config_h;
+  Config::AutoConf::INI->check();
+
+The default value for C<$config_ini> is 'config_autoconf.ini'.
 
 The result value is always an instance of Config::AutoConf::INI
 
@@ -198,6 +203,8 @@ This is an interface to C<Config::AutoConf>'s C<write_config_h>.
 
 sub check {
     my ($self, $config_ini) = @_;
+
+    $config_ini //= 'config_autoconf.ini';
 
     $self = __PACKAGE__->new() unless blessed $self;
 
