@@ -1,3 +1,153 @@
-Please do:
+DESCRIPTION
 
-perldoc Config::AutoConf::INI
+    This module is a extending Config::AutoConf, using a INI-like config
+    file.
+
+SYNOPSIS
+
+        use Config::AutoConf::INI;
+    
+        Config::AutoConf::INI->new()->check('config.ini')->write_config_h;
+
+SUBROUTINES/METHODS
+
+ check($config_ini)
+
+    Performs all checks that are in the INI file $config_ini and that are
+    responsible for configuring Config::AutoConf or defining autoconf
+    variables. The following sections are supported, and executed in the
+    order listed below:
+
+    Configuration sections
+
+      Includes
+
+	This is an interface to Config::AutoConf's push_includes.
+
+          [includes]
+          ; Anything on the the left-hand side is used if the right-hand side is a true value.
+          ; Example:
+          . = 1
+          /this/path = 0
+          C:\Windows\Temp = 1
+
+      Preprocessor flags
+
+	This is an interface to Config::AutoConf's push_preprocess_flags.
+
+          [preprocess_flags]
+          ; Anything on the the left-hand side is used if the right-hand side is a true value.
+          ; Example:
+          -DCPPFLAG0N = 1
+          -DCPPFLAG0FF = 0
+
+      Compiler flags
+
+	This is an interface to Config::AutoConf's push_compiler_flags.
+
+          [compiler_flags]
+          ; Anything on the the left-hand side is used if the right-hand side is a true value.
+          ; Example:
+          -DCCFLAG0N = 1
+          -DCCFLAG0FF = 0
+
+      Linker flags
+
+	This is an interface to Config::AutoConf's push_link_flags.
+
+          [link_flags]
+          ; Anything on the the left-hand side is used if the right-hand side is a true value.
+          ; Example:
+          --very = 1
+          --special = 0
+
+    Check sections
+
+      Config::AutoConf provides bundles that are explicitly supported in a
+      bundle section, i.e.:
+
+        [bundle]
+        ; The bundle check on the left-hand side is done when the right-hand side is a true value.
+        ; The only supported bundles are stdc_headers, default_headers and dirent_headers.
+        ; Example:
+        stdc_headers = 1
+        default_headers = 1
+        dirent_headers = 1
+
+      In all the following sections, if the right-hand side is a true value
+      the check is executed. If the right-hand side does not look like a
+      number then a variable is explicitly created with that name (e.g.
+      I_HAVE_STDIO_G). This does not prevent the default variable to be
+      created (i.e.g HQVE_STDIO_H). The wanted variable name can very well
+      be equal to the default name.
+
+      Files
+
+	This is an interface to Config::AutoConf's check_file.
+
+          [files]
+          /etc/passwd = HAVE_ETC_PASSWD
+          /tmp/this = 0
+          /tmp/that = HAVE_TMP_THAT
+
+      Programs
+
+	This is an interface to Config::AutoConf's check_prog.
+
+          [progs]
+          cc = CC_NAME
+
+      Headers
+
+	This is an interface to Config::AutoConf's check_header.
+
+          [headers]
+          stddef.h = 0
+          time.h = 1
+
+      Declarations
+
+	This is an interface to Config::AutoConf's check_decl.
+
+          [decls]
+          read = 1
+
+      Functions
+
+	This is an interface to Config::AutoConf's check_func.
+
+          [funcs]
+          read = 1
+
+      Types
+
+	This is an interface to Config::AutoConf's check_type.
+
+          [types]
+          size_t = 1
+
+      Types sizeof
+
+	This is an interface to Config::AutoConf's check_sizeof_types.
+
+          [sizeof_types]
+          size_t = 1
+
+      Types offset
+
+	This is an interface to Config::AutoConf's check_alignof_types.
+
+          [alignof_types]
+          struct tm.tm_year = 1
+
+      Aggregate members
+
+	This is an interface to Config::AutoConf's check_member.
+
+          [members]
+          struct tm.tm_year = 1
+
+SEE ALSO
+
+    Config::AutoConf
+
