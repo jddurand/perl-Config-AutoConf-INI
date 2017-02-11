@@ -7,8 +7,11 @@ SYNOPSIS
 
         use Config::AutoConf::INI;
     
-        Config::AutoConf::INI->new()->check('config.ini')->write_config_h;
-        Config::AutoConf::INI->check('config.ini')->write_config_h;
+        Config::AutoConf::INI->new()->check('config.ini');
+        Config::AutoConf::INI->new()->check();
+    
+        Config::AutoConf::INI->check('config.ini');
+        Config::AutoConf::INI->check();
 
 SUBROUTINES/METHODS
 
@@ -24,9 +27,11 @@ SUBROUTINES/METHODS
 
       my $self = Config::AutoConf::INI->new();
       $self->check('config.ini');
-      $self->->write_config_h;
+      $self->write_config_h('somewhere_else.h');
     
-      Config::AutoConf::INI->check('config.ini')->write_config_h;
+      Config::AutoConf::INI->check();
+
+    The default value for $config_ini is 'config_autoconf.ini'.
 
     The result value is always an instance of Config::AutoConf::INI
 
