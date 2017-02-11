@@ -171,7 +171,7 @@ SUBROUTINES/METHODS
 
     Result sections
 
-      Output
+      Outputs
 
 	This is an interface to Config::AutoConf's write_config_h.
 
@@ -238,6 +238,9 @@ EXAMPLE
     
       [members]
       struct tm.tm_year = 1
+    
+      [outputs]
+      my_config.h = 1
 
 SEE ALSO
 

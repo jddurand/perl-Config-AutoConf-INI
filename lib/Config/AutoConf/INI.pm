@@ -190,7 +190,7 @@ This is an interface to C<Config::AutoConf>'s C<check_member>.
 
 =over
 
-=item Output
+=item Outputs
 
 This is an interface to C<Config::AutoConf>'s C<write_config_h>.
 
@@ -446,6 +446,9 @@ Here is an example of a .ini file:
 
   [members]
   struct tm.tm_year = 1
+
+  [outputs]
+  my_config.h = 1
 
 =head1 SEE ALSO
 
