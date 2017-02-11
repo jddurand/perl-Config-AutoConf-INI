@@ -15,6 +15,7 @@ version 0.001
     use Config::AutoConf::INI;
 
     Config::AutoConf::INI->new()->check('config.ini')->write_config_h;
+    Config::AutoConf::INI->check('config.ini')->write_config_h;
 
 =head1 DESCRIPTION
 
@@ -24,7 +25,17 @@ This module is a extending Config::AutoConf, using a INI-like config file.
 
 =head2 check($config_ini)
 
-Performs all checks that are in the INI file C<$config_ini> and that are responsible for configuring Config::AutoConf or defining autoconf I<variables>. The following sections are supported, and executed in the order listed below:
+Performs all checks that are in the INI file C<$config_ini> and that are responsible for configuring Config::AutoConf or defining autoconf I<variables>. The following sections are supported, and executed in the order listed below.
+
+This method can be used using an Config::AutoConf::INI instance, or the class itself:
+
+  my $self = Config::AutoConf::INI->new();
+  $self->check('config.ini');
+  $self->->write_config_h;
+
+  Config::AutoConf::INI->check('config.ini')->write_config_h;
+
+The result value is always an instance of Config::AutoConf::INI
 
 =over
 
@@ -156,6 +167,22 @@ This is an interface to C<Config::AutoConf>'s C<check_member>.
 
   [members]
   struct tm.tm_year = 1
+
+=back
+
+=item Result sections
+
+=over
+
+=item Output
+
+This is an interface to C<Config::AutoConf>'s C<write_config_h>.
+
+  [outputs]
+  ; Anything on the the left-hand side is produced if the right-hand side is a true value.
+  ; Example:
+  config_autoconf.h = 1
+  config.h = 0
 
 =back
 

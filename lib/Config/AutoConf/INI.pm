@@ -192,6 +192,8 @@ This is an interface to C<Config::AutoConf>'s C<write_config_h>.
 
 =back
 
+=back
+
 =cut
 
 sub check {
