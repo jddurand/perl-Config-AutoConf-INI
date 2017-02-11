@@ -23,11 +23,16 @@ This module is a extending Config::AutoConf, using a INI-like config file.
 
     use Config::AutoConf::INI;
 
+    #
+    # Config::AutoConf::INI->new() is an instance of Config::AutoConf
+    #
     Config::AutoConf::INI->new()->check('config.ini');
     Config::AutoConf::INI->new()->check();
 
-    Config::AutoConf::INI->check('config.ini');
-    Config::AutoConf::INI->check();
+    #
+    # Shortest form
+    #
+    Config::AutoConf::INI->check;
 
 =head1 SUBROUTINES/METHODS
 

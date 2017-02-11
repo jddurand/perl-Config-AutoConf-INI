@@ -14,11 +14,16 @@ version 0.001
 
     use Config::AutoConf::INI;
 
+    #
+    # Config::AutoConf::INI->new() is an instance of Config::AutoConf
+    #
     Config::AutoConf::INI->new()->check('config.ini');
     Config::AutoConf::INI->new()->check();
 
-    Config::AutoConf::INI->check('config.ini');
-    Config::AutoConf::INI->check();
+    #
+    # Shortest form
+    #
+    Config::AutoConf::INI->check;
 
 =head1 DESCRIPTION
 
