@@ -346,6 +346,64 @@ sub _process_from_config {
     $self
 }
 
+=head1 EXAMPLE
+
+Here is an example of a .ini file:
+
+  [includes]
+  . = 1
+  /this/path = 1
+
+  [preprocess_flags]
+  -DFLAG01 = 1
+  -DFLAG02 = 0
+
+  [compiler_flags]
+  -DFLAG01 = 0
+  -DFLAG02 = 1
+
+  [link_flags]
+  -lm = 1
+  -loff = 0
+
+  [bundle]
+  stdc_headers = 1
+  default_headers = 1
+  dirent_headers = 1
+
+  [files]
+  /etc/passwd = HAVE_ETC_PASSWD
+  /tmp/this = HAVE_THIS
+  /tmp/that = HAVE_THAT
+  C:\Windows\Temp\foo = HAVE_C_WINDOWS_TEMP_FOO
+
+  [progs]
+  cc = CC_NAME
+
+  [headers]
+  stdio.h = 1
+  stddef.h = HAVE_STDDEF_H
+  time.h = 1
+
+  [decls]
+  read = 1
+  notchecked = 0
+
+  [funcs]
+  read = 1
+
+  [types]
+  size_t = 1
+
+  [sizeof_types]
+  size_t = 1
+
+  [alignof_types]
+  struct tm.tm_year = 1
+
+  [members]
+  struct tm.tm_year = 1
+
 =head1 SEE ALSO
 
 L<Config::AutoConf>

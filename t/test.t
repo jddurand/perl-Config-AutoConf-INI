@@ -15,12 +15,6 @@ ok($c->check($tmp->filename));
 1;
 __DATA__
 
-; ------------
-; Config setup
-; ------------
-[setup]
-reuse_all_headers = 1
-
 ; --------------
 ; Compiler setup
 ; --------------
