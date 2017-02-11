@@ -142,6 +142,7 @@ This is an interface to C<Config::AutoConf>'s C<check_header>.
   stddef.h = 0
   time.h = 1
 
+Please note that I<all> found headers are systematically reinjected in any further test, in contrary to Config::AutoConf default behaviour, that is to reuse only STDC headers.
 =item Declarations
 
 This is an interface to C<Config::AutoConf>'s C<check_decl>.
