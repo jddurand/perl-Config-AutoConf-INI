@@ -127,7 +127,9 @@ SUBROUTINES/METHODS
           stddef.h = 0
           time.h = 1
 
-      Declarations
+	Please note that all found headers are systematically reinjected in
+	any further test, in contrary to Config::AutoConf default
+	behaviour, that is to reuse only STDC headers. =item Declarations
 
 	This is an interface to Config::AutoConf's check_decl.
 
