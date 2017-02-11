@@ -1,0 +1,237 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Config::AutoConf::INI - Drive Config::AutoConf with an INI file
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+    use Config::AutoConf::INI;
+
+    Config::AutoConf::INI->new()->check('config.ini')->write_config_h;
+
+=head1 DESCRIPTION
+
+This module is a extending Config::AutoConf, using a INI-like config file.
+
+=head1 SUBROUTINES/METHODS
+
+=head2 check($config_ini)
+
+Performs all checks that are in the INI file C<$config_ini> and that are responsible for configuring Config::AutoConf or defining autoconf I<variables>. The following sections are supported, and executed in the order listed below:
+
+=over
+
+=item Configuration sections
+
+=over
+
+=item Includes
+
+This is an interface to C<Config::AutoConf>'s C<push_includes>.
+
+  [includes]
+  ; Anything on the the left-hand side is used if the right-hand side is a true value.
+  ; Example:
+  . = 1
+  /this/path = 0
+  C:\Windows\Temp = 1
+
+=item Preprocessor flags
+
+This is an interface to C<Config::AutoConf>'s C<push_preprocess_flags>.
+
+  [preprocess_flags]
+  ; Anything on the the left-hand side is used if the right-hand side is a true value.
+  ; Example:
+  -DCPPFLAG0N = 1
+  -DCPPFLAG0FF = 0
+
+=item Compiler flags
+
+This is an interface to C<Config::AutoConf>'s C<push_compiler_flags>.
+
+  [compiler_flags]
+  ; Anything on the the left-hand side is used if the right-hand side is a true value.
+  ; Example:
+  -DCCFLAG0N = 1
+  -DCCFLAG0FF = 0
+
+=item Linker flags
+
+This is an interface to C<Config::AutoConf>'s C<push_link_flags>.
+
+  [link_flags]
+  ; Anything on the the left-hand side is used if the right-hand side is a true value.
+  ; Example:
+  --very = 1
+  --special = 0
+
+=back
+
+=item Check sections
+
+Config::AutoConf provides bundles that are explicitly supported in a I<bundle> section, i.e.:
+
+  [bundle]
+  ; The bundle check on the left-hand side is done when the right-hand side is a true value.
+  ; The only supported bundles are stdc_headers, default_headers and dirent_headers.
+  ; Example:
+  stdc_headers = 1
+  default_headers = 1
+  dirent_headers = 1
+
+In all the following sections, if the right-hand side is a true value the check is executed. If the right-hand side does not look like a number then a variable is explicitly created with that name (e.g. C<I_HAVE_STDIO_G>). This does not prevent the default variable to be created (i.e.g C<HQVE_STDIO_H>). The wanted variable name can very well be equal to the default name.
+
+=over
+
+=item Files
+
+This is an interface to C<Config::AutoConf>'s C<check_file>.
+
+  [files]
+  /etc/passwd = HAVE_ETC_PASSWD
+  /tmp/this = 0
+  /tmp/that = HAVE_TMP_THAT
+
+=item Programs
+
+This is an interface to C<Config::AutoConf>'s C<check_prog>.
+
+  [progs]
+  cc = CC_NAME
+
+=item Headers
+
+This is an interface to C<Config::AutoConf>'s C<check_header>.
+
+  [headers]
+  stddef.h = 0
+  time.h = 1
+
+=item Declarations
+
+This is an interface to C<Config::AutoConf>'s C<check_decl>.
+
+  [decls]
+  read = 1
+
+=item Functions
+
+This is an interface to C<Config::AutoConf>'s C<check_func>.
+
+  [funcs]
+  read = 1
+
+=item Types
+
+This is an interface to C<Config::AutoConf>'s C<check_type>.
+
+  [types]
+  size_t = 1
+
+=item Types sizeof
+
+This is an interface to C<Config::AutoConf>'s C<check_sizeof_types>.
+
+  [sizeof_types]
+  size_t = 1
+
+=item Types offset
+
+This is an interface to C<Config::AutoConf>'s C<check_alignof_types>.
+
+  [alignof_types]
+  struct tm.tm_year = 1
+
+=item Aggregate members
+
+This is an interface to C<Config::AutoConf>'s C<check_member>.
+
+  [members]
+  struct tm.tm_year = 1
+
+=back
+
+=back
+
+=head1 EXAMPLE
+
+Here is an example of a .ini file:
+
+  [includes]
+  . = 1
+  /this/path = 1
+
+  [preprocess_flags]
+  -DFLAG01 = 1
+  -DFLAG02 = 0
+
+  [compiler_flags]
+  -DFLAG01 = 0
+  -DFLAG02 = 1
+
+  [link_flags]
+  -lm = 1
+  -loff = 0
+
+  [bundle]
+  stdc_headers = 1
+  default_headers = 1
+  dirent_headers = 1
+
+  [files]
+  /etc/passwd = HAVE_ETC_PASSWD
+  /tmp/this = HAVE_THIS
+  /tmp/that = HAVE_THAT
+  C:\Windows\Temp\foo = HAVE_C_WINDOWS_TEMP_FOO
+
+  [progs]
+  cc = CC_NAME
+
+  [headers]
+  stdio.h = 1
+  stddef.h = HAVE_STDDEF_H
+  time.h = 1
+
+  [decls]
+  read = 1
+  notchecked = 0
+
+  [funcs]
+  read = 1
+
+  [types]
+  size_t = 1
+
+  [sizeof_types]
+  size_t = 1
+
+  [alignof_types]
+  struct tm.tm_year = 1
+
+  [members]
+  struct tm.tm_year = 1
+
+=head1 SEE ALSO
+
+L<Config::AutoConf>
+
+=head1 AUTHOR
+
+Jean-Damien Durand <jeandamiendurand@free.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Jean-Damien Durand.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
