@@ -5,7 +5,7 @@ package Config::AutoConf::INI;
 use Carp                   qw/croak/;
 use Config::AutoConf 0.313 qw//;
 use Config::INI::Reader    qw//;
-use Scalar::Util           qw/looks_like_number/;
+use Scalar::Util           qw/looks_like_number blessed/;
 use parent                 qw/Config::AutoConf/;
 use SUPER;
 
@@ -165,12 +165,28 @@ This is an interface to C<Config::AutoConf>'s C<check_member>.
 
 =back
 
+=item Result sections
+
+=over
+
+=item Output
+
+This is an interface to C<Config::AutoConf>'s C<write_config_h>.
+
+  [outputs]
+  ; Anything on the the left-hand side is produced if the right-hand side is a true value.
+  ; Example:
+  config_autoconf.h = 1
+  config.h = 0
+
 =back
 
 =cut
 
 sub check {
     my ($self, $config_ini) = @_;
+
+    $self = __PACKAGE__->new() unless blessed $self;
 
     #
     # Internal setup
@@ -213,6 +229,8 @@ sub check {
     $self->_process_from_config(section    => 'sizeof_types',   stub_name => 'check_sizeof_type',  args => \&_args_check);
     $self->_process_from_config(section    => 'alignof_types',  stub_name => 'check_alignof_type', args => \&_args_check);
     $self->_process_from_config(section    => 'members',        stub_name => 'check_member',       args => \&_args_check);
+
+    $self->_process_from_config(section    => 'outputs',        stub_name => 'write_config_h');
 
     delete $self->{_config_ini};
     delete $self->{_headers_ok};

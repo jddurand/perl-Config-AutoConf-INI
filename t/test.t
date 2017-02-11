@@ -2,7 +2,7 @@ use strict;
 use warnings FATAL => 'all';
 use File::Temp;
 
-use Test::More tests => 3;
+use Test::More tests => 4;
 BEGIN { require_ok('Config::AutoConf::INI') };
 
 my $tmp = File::Temp->new(UNLINK => 1, SUFFIX => '.ini');
@@ -11,6 +11,7 @@ close($tmp) || warn "Failed to close $tmp";
 
 my $c = new_ok('Config::AutoConf::INI');
 ok($c->check($tmp->filename));
+ok(Config::AutoConf::INI->check($tmp->filename));
 
 1;
 __DATA__
@@ -98,3 +99,8 @@ struct tm.tm_year = 1
 [members]
 ; Interface to check_member
 struct tm.tm_year = 1
+
+[outputs]
+; Anything on the the left-hand side is produced if the right-hand side is a true value.
+config_autoconf.h = 1
+config.h = 0
