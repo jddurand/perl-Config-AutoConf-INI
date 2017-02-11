@@ -225,7 +225,7 @@ L<Config::AutoConf>
 
 =head1 AUTHOR
 
-Jean-Damien Durand <jeandamiendurand@free.fr>
+Jean-Damien Durand <jddpause@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
