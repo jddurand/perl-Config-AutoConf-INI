@@ -24,12 +24,23 @@ This module is a extending Config::AutoConf, using a INI-like config file.
     use Config::AutoConf::INI;
 
     Config::AutoConf::INI->new()->check('config.ini')->write_config_h;
+    Config::AutoConf::INI->check('config.ini')->write_config_h;
 
 =head1 SUBROUTINES/METHODS
 
 =head2 check($config_ini)
 
-Performs all checks that are in the INI file C<$config_ini> and that are responsible for configuring Config::AutoConf or defining autoconf I<variables>. The following sections are supported, and executed in the order listed below:
+Performs all checks that are in the INI file C<$config_ini> and that are responsible for configuring Config::AutoConf or defining autoconf I<variables>. The following sections are supported, and executed in the order listed below.
+
+This method can be used using an Config::AutoConf::INI instance, or the class itself:
+
+  my $self = Config::AutoConf::INI->new();
+  $self->check('config.ini');
+  $self->->write_config_h;
+
+  Config::AutoConf::INI->check('config.ini')->write_config_h;
+
+The result value is always an instance of Config::AutoConf::INI
 
 =over
 
