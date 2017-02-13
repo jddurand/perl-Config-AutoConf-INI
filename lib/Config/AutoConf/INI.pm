@@ -7,7 +7,6 @@ use Config::AutoConf 0.313 qw//;
 use Config::INI::Reader    qw//;
 use Scalar::Util           qw/looks_like_number blessed/;
 use parent                 qw/Config::AutoConf/;
-use SUPER;
 
 # ABSTRACT: Drive Config::AutoConf with an INI file
 
@@ -352,7 +351,8 @@ sub _process_from_config {
     my $sectionp = $self->{_config_ini}->{$section};
     $sectionp //= {};
 
-    while (my ($key, $rhs) = each(%{$sectionp})) {
+    foreach my $key (sort keys %{$sectionp}) {
+        my $rhs = $sectionp->{$key};
         #
         # No check if rhs is not a true value
         #
