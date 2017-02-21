@@ -5,6 +5,8 @@ package Config::AutoConf::INI;
 use Carp                   qw/croak/;
 use Config::AutoConf 0.313 qw//;
 use Config::INI::Reader    qw//;
+use File::Basename         qw/fileparse/;
+use File::Path             qw/make_path/;
 use Scalar::Util           qw/looks_like_number blessed/;
 use parent                 qw/Config::AutoConf/;
 
@@ -255,7 +257,7 @@ sub check {
     $self->_process_from_config(section    => 'alignof_types',  stub_name => 'check_alignof_type', args => \&_args_check);
     $self->_process_from_config(section    => 'members',        stub_name => 'check_member',       args => \&_args_check);
 
-    $self->_process_from_config(section    => 'outputs',        stub_name => 'write_config_h');
+    $self->_process_from_config(section    => 'outputs',        stub_name => '_write_config_h');
 
     delete $self->{_config_ini};
     delete $self->{_headers_ok};
@@ -277,6 +279,24 @@ sub _check_bundle {
     } elsif ($bundle eq 'dirent_headers') {
         $self->check_dirent_header(@args)
     }
+}
+
+#
+# We want to make sure that the dirname of path exist
+#
+sub _write_config_h {
+    my ($self, $path) = @_;
+
+    #
+    # We do not mind about suffixes, only directory name
+    # Note that File::Basename says that fileparse()
+    # should be used instead of dirname()
+    #
+    my ($filename, $dirs, $suffix) = fileparse($path);
+    if ($dirs) {
+        make_path($dirs); # This will croak in case of failure
+    }
+    $self->write_config_h($path);
 }
 
 #
