@@ -4,7 +4,7 @@ use warnings FATAL => 'all';
 package Config::AutoConf::INI;
 use Carp                   qw/croak/;
 use Config::AutoConf 0.313 qw//;
-use Config::INI::Reader    qw//;
+use Config::Tiny::Ordered  qw//;
 use File::Basename         qw/fileparse/;
 use File::Path             qw/make_path/;
 use Scalar::Util           qw/looks_like_number blessed/;
@@ -39,7 +39,7 @@ This module is a extending Config::AutoConf, using a INI-like config file.
 
 =head2 check($config_ini)
 
-Performs all checks that are in the INI file C<$config_ini> and that are responsible for configuring Config::AutoConf or defining autoconf I<variables>. The following sections are supported, and executed in the order listed below.
+Performs all checks that are in the INI file C<$config_ini> and that are responsible for configuring Config::AutoConf or defining autoconf I<variables>. The following sections are supported, and executed in the order listed below. Within every section, entries are executed in the same order as the INI file.
 
 This method can be used using an Config::AutoConf::INI instance, or the class itself:
 
@@ -104,18 +104,9 @@ This is an interface to C<Config::AutoConf>'s C<push_link_flags>.
 
 =item Check sections
 
-Config::AutoConf provides bundles that are explicitly supported in a I<bundle> section, i.e.:
+In the following sections, if the right-hand side is a true value the check is executed.
 
-  [bundle]
-  ; The bundle check on the left-hand side is done when the right-hand side is a true value.
-  ; The only supported bundles are stdc_headers, default_headers and dirent_headers.
-  ; Example:
-  stdc_headers = 1
-  default_headers = 1
-  dirent_headers = 1
-
-
-In all the following sections, if the right-hand side is a true value the check is executed. If the right-hand side does not look like a number then a variable is explicitly created with that name (e.g. C<I_HAVE_STDIO_G>). This does not prevent the default variable to be created (i.e.g C<HQVE_STDIO_H>). The wanted variable name can very well be equal to the default name.
+If the right-hand side does not look like a number then a variable is explicitly created with that name (e.g. C<I_HAVE_STDIO_H>), with the exception of the C<[bundle]> section where right-hand side is always used as a boolean. This does not prevent a C<Config::AutoConf> default variable, if any, to be created (i.e.g C<HAVE_STDIO_H>), though the wanted variable name can very well be equal to the default.
 
 =over
 
@@ -143,7 +134,20 @@ This is an interface to C<Config::AutoConf>'s C<check_header>.
   stddef.h = 0
   time.h = 1
 
-Please note that I<all> found headers are systematically reinjected in any further test, in contrary to Config::AutoConf default behaviour, that is to reuse only STDC headers.
+Please note that I<all> found headers are systematically reinjected in any further test, in the same order as their configuration appearance in the INI file, in contrary to Config::AutoConf default behaviour, that is to reuse only STDC headers.
+
+=item Bundled headers
+
+  [bundle]
+  ; The bundle check on the left-hand side is done when the right-hand side is a true value.
+  ; The only supported bundles are stdc_headers, default_headers and dirent_headers.
+  ; Example:
+  stdc_headers = 1
+  default_headers = 1
+  dirent_headers = Treated_Like_A_Boolean
+
+Note that right-hand side is alwaws considered as a boolean. C<Config::AutoConf::INI> will keep new found headers in order, though the order depend on how C<Config::AutoConf> is implemented.
+
 =item Declarations
 
 This is an interface to C<Config::AutoConf>'s C<check_decl>.
@@ -218,8 +222,9 @@ sub check {
     #
     # Internal setup
     #
+    $self->{_headers_order} = 0;
     $self->{_headers_ok} = {};
-    $self->{_config_ini} = $config_ini ? Config::INI::Reader->read_file($config_ini) : {};
+    $self->{_config_ini} = $config_ini ? Config::Tiny::Ordered->read($config_ini) : {};
 
     #
     # Setup
@@ -248,8 +253,8 @@ sub check {
                                                cc         => 'check_prog_cc'
                                               }
                                );
-    $self->_process_from_config(section    => 'bundle',         stub_name  => '_check_bundle');
     $self->_process_from_config(section    => 'headers',        stub_name => 'check_header',       args => \&_args_check_header);
+    $self->_process_from_config(section    => 'bundle',         stub_name  => '_check_bundle');
     $self->_process_from_config(section    => 'decls',          stub_name => 'check_decl',         args => \&_args_check);
     $self->_process_from_config(section    => 'funcs',          stub_name => 'check_func',         args => \&_args_check);
     $self->_process_from_config(section    => 'types',          stub_name => 'check_type',         args => \&_args_check);
@@ -259,8 +264,8 @@ sub check {
 
     $self->_process_from_config(section    => 'outputs',        stub_name => '_write_config_h');
 
-    delete $self->{_config_ini};
-    delete $self->{_headers_ok};
+    map { delete $self->{$_} } qw/_config_ini _headers_ok _headers_order/;
+
     $self;
 }
 
@@ -303,10 +308,16 @@ sub _write_config_h {
 # Config::AutoConf does not honor all the found headers, so we generate
 # ourself the prologue
 #
+sub _ordered_headers {
+    my ($self) = @_;
+
+    return sort { $self->{_headers_ok}->{$a} <=> $self->{_headers_ok}->{$b} } keys %{$self->{_headers_ok}}
+}
+
 sub _prologue {
   my ($self) = @_;
 
-  my $prologue = join("\n", map { "#include <$_>" } keys %{$self->{_headers_ok}}) . "\n";
+  my $prologue = join("\n", map { "#include <$_>" } $self->_ordered_headers) . "\n";
 
   return $prologue
 }
@@ -335,7 +346,7 @@ sub _args_check {
 sub _header_ok {
     my ($self, @headers) = @_;
 
-    map { $self->{_headers_ok}->{$_}++ } @headers
+    map { $self->{_headers_ok}->{$_} = $self->{_headers_order}++ unless exists $self->{_headers_ok}->{$_} } @headers
 }
 
 sub _args_check_header {
@@ -369,10 +380,11 @@ sub _process_from_config {
     my $args       = $args{args};
 
     my $sectionp = $self->{_config_ini}->{$section};
-    $sectionp //= {};
+    $sectionp //= [];
 
-    foreach my $key (sort keys %{$sectionp}) {
-        my $rhs = $sectionp->{$key};
+    foreach (@{$sectionp}) {
+        my $key = $_->{'key'};
+        my $rhs = $_->{'value'};
         #
         # No check if rhs is not a true value
         #
@@ -410,6 +422,16 @@ sub _process_from_config {
     $self
 }
 
+=head1 NOTES
+
+=over
+
+=item Non-existing INI file
+
+Trying to read a non-existing INI file is a no-op.
+
+=back
+
 =head1 EXAMPLE
 
 Here is an example of a .ini file:
@@ -430,11 +452,6 @@ Here is an example of a .ini file:
   -lm = 1
   -loff = 0
 
-  [bundle]
-  stdc_headers = 1
-  default_headers = 1
-  dirent_headers = 1
-
   [files]
   /etc/passwd = HAVE_ETC_PASSWD
   /tmp/this = HAVE_THIS
@@ -448,6 +465,11 @@ Here is an example of a .ini file:
   stdio.h = 1
   stddef.h = HAVE_STDDEF_H
   time.h = 1
+
+  [bundle]
+  stdc_headers = 1
+  default_headers = 1
+  dirent_headers = 1
 
   [decls]
   read = 1
