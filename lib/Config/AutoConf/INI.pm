@@ -146,7 +146,7 @@ Please note that I<all> found headers are systematically reinjected in any furth
   default_headers = 1
   dirent_headers = Treated_Like_A_Boolean
 
-Note that right-hand side is alwaws considered as a boolean. C<Config::AutoConf::INI> will keep new found headers in order, though the order depend on how C<Config::AutoConf> is implemented.
+Note that the right-hand side is always considered as a boolean. C<Config::AutoConf::INI> will keep new found headers in order, though the order depend on how C<Config::AutoConf> is implemented.
 
 =item Declarations
 
@@ -311,7 +311,8 @@ sub _write_config_h {
 sub _ordered_headers {
     my ($self) = @_;
 
-    return sort { $self->{_headers_ok}->{$a} <=> $self->{_headers_ok}->{$b} } keys %{$self->{_headers_ok}}
+    my @rc = sort { $self->{_headers_ok}->{$a} <=> $self->{_headers_ok}->{$b} } keys %{$self->{_headers_ok}};
+    return @rc
 }
 
 sub _prologue {
@@ -495,7 +496,7 @@ Here is an example of a .ini file:
 
 =head1 SEE ALSO
 
-L<Config::AutoConf>
+L<Config::AutoConf>, L<Config::Tiny::Ordered>
 
 =cut
 
