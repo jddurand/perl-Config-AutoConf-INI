@@ -103,3 +103,4 @@ struct tm.tm_year = 1
 ; Anything on the the left-hand side is produced if the right-hand side is a true value.
 config_autoconf.h = 1
 config.h = 0
+localpath/created/config_autoconf.h = 1

@@ -6,7 +6,7 @@ use Carp                   qw/croak/;
 use Config::AutoConf 0.313 qw//;
 use Config::Tiny::Ordered  qw//;
 use File::Basename         qw/fileparse/;
-use File::Path             qw/make_path/;
+use File::Path             qw//;
 use Scalar::Util           qw/looks_like_number blessed/;
 use parent                 qw/Config::AutoConf/;
 
@@ -15,6 +15,14 @@ use parent                 qw/Config::AutoConf/;
 # VERSION
 
 # AUTHORITY
+
+our $_make_path;
+BEGIN {
+    #
+    # Old versions of File::Path does not provide make_path, but the legacy mkpath
+    #
+    $_make_path = File::Path->can('make_path') || File::Path->can('mkpath');
+}
 
 =head1 DESCRIPTION
 
@@ -299,7 +307,7 @@ sub _write_config_h {
     #
     my ($filename, $dirs, $suffix) = fileparse($path);
     if ($dirs) {
-        make_path($dirs); # This will croak in case of failure
+        &$_make_path($dirs); # This will croak in case of failure
     }
     $self->write_config_h($path);
 }
